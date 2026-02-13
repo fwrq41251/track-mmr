@@ -3,7 +3,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
+using System.Windows.Input;
 using Avalonia.Markup.Xaml;
+using CommunityToolkit.Mvvm.Input;
 using TrackMmr.Desktop.ViewModels;
 using TrackMmr.Desktop.Views;
 
@@ -11,6 +13,16 @@ namespace TrackMmr.Desktop;
 
 public partial class App : Application
 {
+    public ICommand ToggleWindowCommand { get; }
+    public ICommand ExitAppCommand { get; }
+
+    public App()
+    {
+        ToggleWindowCommand = new RelayCommand(ToggleWindow);
+        ExitAppCommand = new RelayCommand(ExitApp);
+        DataContext = this;
+    }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -20,8 +32,6 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-            // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
@@ -32,7 +42,7 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    public void ToggleWindow_Click(object? sender, System.EventArgs e)
+    private void ToggleWindow()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
         {
@@ -48,7 +58,7 @@ public partial class App : Application
         }
     }
 
-    public void ExitApp_Click(object? sender, System.EventArgs e)
+    private void ExitApp()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -62,11 +72,9 @@ public partial class App : Application
 
     private void DisableAvaloniaDataAnnotationValidation()
     {
-        // Get an array of plugins to remove
         var dataValidationPluginsToRemove =
             BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
 
-        // remove each entry found
         foreach (var plugin in dataValidationPluginsToRemove)
         {
             BindingPlugins.DataValidators.Remove(plugin);

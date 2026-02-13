@@ -27,6 +27,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _currentMmr = "-";
 
     [ObservableProperty]
+    private int _currentPageIndex = 0; // 0: Dashboard, 1: History, 2: Stats
+
+    [ObservableProperty]
     private ISeries[] _mmrSeries = [];
 
     [ObservableProperty]
@@ -36,6 +39,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private Axis[] _yAxes = [];
 
     public ObservableCollection<MatchRowViewModel> Matches { get; } = new();
+    public ObservableCollection<HeroStatViewModel> HeroStats { get; } = new();
 
     [ObservableProperty]
     private string _username = "";
@@ -174,6 +178,25 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         UpdateChart(records);
+        UpdateHeroStats(records);
+    }
+
+    private void UpdateHeroStats(System.Collections.Generic.List<MmrRecord> records)
+    {
+        HeroStats.Clear();
+        var stats = records.GroupBy(r => r.HeroId)
+            .Select(g => new HeroStatViewModel
+            {
+                HeroName = HeroNames.Get(g.Key),
+                IconUrl = HeroNames.GetIconUrl(g.Key),
+                TotalGames = g.Count(),
+                Wins = g.Count(r => r.Winner),
+                MmrChange = g.Sum(r => r.MmrChange)
+            })
+            .OrderByDescending(s => s.TotalGames)
+            .ToList();
+
+        foreach (var s in stats) HeroStats.Add(s);
     }
 
     private void UpdateChart(System.Collections.Generic.List<MmrRecord> records)
@@ -227,4 +250,19 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         ];
     }
+}
+
+public class HeroStatViewModel
+{
+    public string HeroName { get; init; } = "";
+    public string IconUrl { get; init; } = "";
+    public int TotalGames { get; init; }
+    public int Wins { get; init; }
+    public int MmrChange { get; init; }
+    public double WinRate => TotalGames == 0 ? 0 : (double)Wins / TotalGames;
+    public string WinRateDisplay => $"{WinRate:P1}";
+    public Avalonia.Media.IBrush MmrBrush => MmrChange >= 0 
+        ? new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#4CAF50")) 
+        : new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#F44336"));
+    public string MmrChangeDisplay => MmrChange >= 0 ? $"+{MmrChange}" : MmrChange.ToString();
 }

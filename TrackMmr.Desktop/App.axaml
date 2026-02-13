@@ -2,8 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="TrackMmr.Desktop.App"
              xmlns:local="using:TrackMmr.Desktop"
+             xmlns:conv="using:TrackMmr.Desktop.Converters"
+             x:DataType="local:App"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Resources>
+        <conv:IntToBoolConverter x:Key="IntToBoolConverter"/>
+    </Application.Resources>
 
     <Application.DataTemplates>
         <local:ViewLocator/>
@@ -15,12 +20,12 @@
 
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/avalonia-logo.ico" ToolTipText="Dota 2 MMR Tracker">
+            <TrayIcon Icon="avares://TrackMmr.Desktop/Assets/avalonia-logo.ico" ToolTipText="Dota 2 MMR Tracker">
                 <TrayIcon.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Show Tracker" Click="ToggleWindow_Click"/>
+                        <NativeMenuItem Header="Show Tracker" Command="{Binding ToggleWindowCommand}"/>
                         <NativeMenuItemSeparator />
-                        <NativeMenuItem Header="Exit" Click="ExitApp_Click"/>
+                        <NativeMenuItem Header="Exit" Command="{Binding ExitAppCommand}"/>
                     </NativeMenu>
                 </TrayIcon.Menu>
             </TrayIcon>

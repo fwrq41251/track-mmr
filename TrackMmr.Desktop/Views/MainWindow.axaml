@@ -5,213 +5,229 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
         xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+        xmlns:conv="using:TrackMmr.Desktop.Converters"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="800"
         x:Class="TrackMmr.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Dota 2 MMR Tracker"
-        Width="1000" Height="800"
-        Background="#121212"
-        Foreground="#E0E0E0"
-        MinWidth="800" MinHeight="600">
+        Width="1100" Height="800"
+        Background="Transparent"
+        TransparencyLevelHint="AcrylicBlur"
+        ExtendClientAreaToDecorationsHint="True">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
+    <Window.Resources>
+        <conv:IntToBoolConverter x:Key="IntToBoolConverter"/>
+    </Window.Resources>
+
     <Window.Styles>
         <Style Selector="Border.Card">
-            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="Background" Value="#CC252525"/>
             <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="BoxShadow" Value="0 4 12 0 #40000000"/>
-            <Setter Property="Margin" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="BoxShadow" Value="0 8 24 0 #30000000"/>
         </Style>
-        <Style Selector="TextBlock.Header">
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="0,0,0,12"/>
-            <Setter Property="Foreground" Value="#BBBBBB"/>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="RadioButton.NavButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Foreground" Value="#999"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="8"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="RadioButton.NavButton:pointerover">
+            <Setter Property="Background" Value="#15FFFFFF"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="RadioButton.NavButton:checked">
+            <Setter Property="Background" Value="#25FFFFFF"/>
+            <Setter Property="Foreground" Value="DodgerBlue"/>
         </Style>
     </Window.Styles>
 
-    <Grid>
-        <!-- Login Panel Overlay -->
-        <Border IsVisible="{Binding NeedsLogin}"
-                Background="#EE000000"
-                ZIndex="100">
-            <Border Background="#252525"
-                    CornerRadius="16"
-                    Padding="40"
-                    MaxWidth="450"
-                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                    BoxShadow="0 10 30 0 #A0000000">
-                <StackPanel Spacing="20">
-                    <Image Source="avares://TrackMmr.Desktop/Assets/avalonia-logo.ico" Height="64" Margin="0,0,0,10"/>
-                    <TextBlock Text="Steam Authentication" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Connect your account to track MMR history" Foreground="Gray" HorizontalAlignment="Center" Margin="0,-10,0,0"/>
-                    
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="Username" FontSize="12" FontWeight="SemiBold" Foreground="#888"/>
-                        <TextBox Text="{Binding Username}" Watermark="Enter Steam Username" Height="40" VerticalContentAlignment="Center"/>
-                    </StackPanel>
-                    
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="Password" FontSize="12" FontWeight="SemiBold" Foreground="#888"/>
-                        <TextBox Text="{Binding Password}" Watermark="Enter Steam Password" PasswordChar="●" Height="40" VerticalContentAlignment="Center"/>
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    BackgroundSource="Digger"
+                    TintColor="Black"
+                    TintOpacity="0.9"
+                    MaterialOpacity="0.8" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
+        <Grid ColumnDefinitions="260, *">
+            <Border Grid.Column="0" BorderBrush="#20FFFFFF" BorderThickness="0,0,1,0" Padding="20,50,20,20">
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <StackPanel Grid.Row="0" Spacing="5" Margin="0,0,0,40">
+                        <TextBlock Text="TRACK MMR" FontSize="24" FontWeight="Black" Foreground="DodgerBlue" LetterSpacing="2"/>
+                        <TextBlock Text="Dota 2 Analytics" FontSize="11" Foreground="#555" FontWeight="Bold"/>
                     </StackPanel>
 
-                    <Button Content="Sign In"
-                            Command="{Binding LoginAndFetchCommand}"
-                            HorizontalAlignment="Stretch"
-                            Height="45"
-                            CornerRadius="8"
-                            FontWeight="Bold"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#1A73E8"
-                            Foreground="White"
-                            Classes="accent"/>
-                    
-                    <TextBlock Text="{Binding StatusText}" 
-                               FontSize="12" 
-                               Foreground="#FF5252" 
-                               TextWrapping="Wrap" 
-                               HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Border>
-        </Border>
+                    <StackPanel Grid.Row="1" Spacing="5">
+                        <RadioButton Classes="NavButton" IsChecked="{Binding CurrentPageIndex, Converter={StaticResource IntToBoolConverter}, ConverterParameter=0}">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <PathIcon Data="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" Width="18"/>
+                                <TextBlock Text="Dashboard" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton Classes="NavButton" IsChecked="{Binding CurrentPageIndex, Converter={StaticResource IntToBoolConverter}, ConverterParameter=1}">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <PathIcon Data="M13 3H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V9l-6-6zm0 1.5L17.5 9H13V4.5zM17 19H7V5h5v5h5v9z" Width="18"/>
+                                <TextBlock Text="Matches" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton Classes="NavButton" IsChecked="{Binding CurrentPageIndex, Converter={StaticResource IntToBoolConverter}, ConverterParameter=2}">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <PathIcon Data="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z" Width="18"/>
+                                <TextBlock Text="Statistics" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
 
-        <!-- Main Layout -->
-        <Grid ColumnDefinitions="280, *">
-            
-            <!-- Sidebar / Stats -->
-            <Border Grid.Column="0" Background="#181818" Padding="20">
-                <StackPanel Spacing="24">
-                    <TextBlock Text="TrackMMR" FontSize="22" FontWeight="Black" Foreground="DodgerBlue" Margin="0,10,0,20"/>
-                    
-                    <Border Classes="Card" Margin="0" Padding="20">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="CURRENT MMR" FontSize="12" FontWeight="Bold" Foreground="#888" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding CurrentMmr}" FontSize="48" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
-                            <Border Background="#2E7D32" CornerRadius="4" Padding="8,2" HorizontalAlignment="Center" Margin="0,8,0,0">
-                                <TextBlock Text="Ranked Active" FontSize="10" FontWeight="Bold" Foreground="White"/>
-                            </Border>
+                    <Border Grid.Row="2" Classes="Card" Background="#10FFFFFF" Padding="15">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Ellipse Width="8" Height="8" Fill="#4CAF50"/>
+                                <TextBlock Text="Steam Connected" FontSize="11" Foreground="#888"/>
+                            </StackPanel>
+                            <Button Command="{Binding FetchMmrCommand}" IsEnabled="{Binding !IsBusy}" HorizontalAlignment="Stretch" Background="#30FFFFFF">
+                                <TextBlock Text="Sync Data" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold"/>
+                            </Button>
                         </StackPanel>
                     </Border>
-
-                    <StackPanel Spacing="10">
-                        <TextBlock Text="QUICK STATS" FontSize="11" FontWeight="Bold" Foreground="#555" Margin="0,10,0,0"/>
-                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="0,5">
-                            <StackPanel Grid.Row="0" Grid.Column="0">
-                                <TextBlock Text="Total Matches" FontSize="11" Foreground="#888"/>
-                                <TextBlock Text="{Binding Matches.Count}" FontSize="18" FontWeight="SemiBold"/>
-                            </StackPanel>
-                            <StackPanel Grid.Row="0" Grid.Column="1">
-                                <TextBlock Text="Auto-Refresh" FontSize="11" Foreground="#888"/>
-                                <TextBlock Text="5 min" FontSize="18" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-
-                    <Separator Background="#333" Margin="0,10"/>
-                    
-                    <Button Command="{Binding FetchMmrCommand}" 
-                            IsEnabled="{Binding !IsBusy}"
-                            Background="#333"
-                            HorizontalAlignment="Stretch"
-                            Height="40"
-                            CornerRadius="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                            <PathIcon Data="M12 2V5M12 19V22M4.22 4.22L6.34 6.34M17.66 17.66L19.78 19.78M2 12H5M19 12H22M4.22 19.78L6.34 17.66M17.66 6.34L19.78 4.22" Width="14"/>
-                            <TextBlock Text="Sync Now" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                    
-                    <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="#777" TextWrapping="Wrap" TextAlignment="Center"/>
-                </StackPanel>
+                </Grid>
             </Border>
 
-            <!-- Main Content Area -->
-            <ScrollViewer Grid.Column="1">
-                <StackPanel Margin="16">
-                    <!-- Chart Section -->
-                    <Border Classes="Card">
-                        <StackPanel>
-                            <TextBlock Text="MMR Trend" Classes="Header"/>
-                            <lvc:CartesianChart Height="300"
-                                                Series="{Binding MmrSeries}"
-                                                XAxes="{Binding XAxes}"
-                                                YAxes="{Binding YAxes}"
-                                                TooltipPosition="Top"
-                                                ZoomMode="X"/>
-                        </StackPanel>
-                    </Border>
+            <Grid Grid.Column="1" RowDefinitions="Auto, *">
+                <Border Grid.Row="0" Height="50"/>
 
-                    <!-- History Section -->
-                    <Border Classes="Card">
-                        <StackPanel>
-                            <TextBlock Text="Recent Match History" Classes="Header"/>
-                            
-                            <!-- Table Header -->
-                            <Border Background="#252525" CornerRadius="8,8,0,0" Padding="12,10">
-                                <Grid ColumnDefinitions="140, 110, 80, 80, *, 80">
-                                    <TextBlock Grid.Column="0" Text="Date &amp; Time" FontSize="12" FontWeight="Bold" Foreground="#777"/>
-                                    <TextBlock Grid.Column="1" Text="Match ID" FontSize="12" FontWeight="Bold" Foreground="#777"/>
-                                    <TextBlock Grid.Column="2" Text="MMR" FontSize="12" FontWeight="Bold" Foreground="#777"/>
-                                    <TextBlock Grid.Column="3" Text="Change" FontSize="12" FontWeight="Bold" Foreground="#777"/>
-                                    <TextBlock Grid.Column="4" Text="Hero Played" FontSize="12" FontWeight="Bold" Foreground="#777"/>
-                                    <TextBlock Grid.Column="5" Text="Result" FontSize="12" FontWeight="Bold" Foreground="#777" HorizontalAlignment="Right"/>
-                                </Grid>
+                <Carousel Grid.Row="1" SelectedIndex="{Binding CurrentPageIndex}">
+                    <Carousel.PageTransition>
+                        <PageSlide Duration="0:0:0.3" Orientation="Vertical" />
+                    </Carousel.PageTransition>
+
+                    <ScrollViewer>
+                        <StackPanel Margin="40,0,40,40" Spacing="30">
+                            <Grid ColumnDefinitions="*, *">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Welcome back," FontSize="14" Foreground="#777"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="15">
+                                        <TextBlock Text="{Binding CurrentMmr}" FontSize="64" FontWeight="Black" Foreground="White"/>
+                                        <TextBlock Text="MMR" FontSize="20" FontWeight="Bold" Foreground="DodgerBlue" VerticalAlignment="Bottom" Margin="0,0,0,12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Classes="Card">
+                                <StackPanel Spacing="20">
+                                    <TextBlock Text="Performance Trend" FontSize="16" FontWeight="Bold"/>
+                                    <lvc:CartesianChart Height="350" Series="{Binding MmrSeries}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" />
+                                </StackPanel>
                             </Border>
+                        </StackPanel>
+                    </ScrollViewer>
 
-                            <!-- List -->
-                            <ItemsControl ItemsSource="{Binding Matches}">
+                    <Grid RowDefinitions="Auto, *">
+                        <TextBlock Grid.Row="0" Text="Match History" FontSize="28" FontWeight="Black" Margin="40,20,40,20"/>
+                        <ListBox Grid.Row="1" ItemsSource="{Binding Matches}" Background="Transparent" Margin="20,0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MatchRowViewModel">
+                                    <Border Classes="Card" Margin="10,5" Padding="15">
+                                        <Grid ColumnDefinitions="Auto, *, Auto, Auto, 100">
+                                            <Border Grid.Column="0" CornerRadius="4" ClipToBounds="True" Margin="0,0,20,0">
+                                                <Image asyncImageLoader:ImageLoader.Source="{Binding HeroIconUrl}" Width="60" Height="34" Stretch="UniformToFill"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Hero}" FontSize="16" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding Date}" FontSize="12" Foreground="#666"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,40,0" HorizontalAlignment="Right">
+                                                <TextBlock Text="{Binding Mmr}" FontSize="18" FontWeight="Black" HorizontalAlignment="Right"/>
+                                                <TextBlock Text="MMR" FontSize="9" FontWeight="Bold" Foreground="#444" HorizontalAlignment="Right"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="3" Text="{Binding MmrChange}" Foreground="{Binding ResultBrush}" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,40,0"/>
+                                            <Border Grid.Column="4" Background="{Binding ResultBrush}" CornerRadius="20" Padding="12,4" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="{Binding Result}" HorizontalAlignment="Center" FontWeight="Black" FontSize="12" Foreground="White"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+
+                    <ScrollViewer>
+                        <StackPanel Margin="40,20,40,40" Spacing="20">
+                            <TextBlock Text="Hero Statistics" FontSize="28" FontWeight="Black" Margin="0,0,0,10"/>
+                            <ItemsControl ItemsSource="{Binding HeroStats}">
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:MatchRowViewModel">
-                                        <Border Background="{Binding RowBackground}" 
-                                                BorderBrush="#252525" 
-                                                BorderThickness="0,0,0,1"
-                                                Padding="12,14">
-                                            <Grid ColumnDefinitions="140, 110, 80, 80, *, 80">
-                                                <TextBlock Grid.Column="0" Text="{Binding Date}" FontSize="13" VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding MatchId}" FontSize="12" Foreground="#888" VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="2" Text="{Binding Mmr}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="3" Text="{Binding MmrChange}" FontSize="14" FontWeight="SemiBold" Foreground="{Binding ResultBrush}" VerticalAlignment="Center"/>
-                                                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                                    <Border CornerRadius="4" ClipToBounds="True">
-                                                        <Image asyncImageLoader:ImageLoader.Source="{Binding HeroIconUrl}" 
-                                                               Width="36" Height="20" 
-                                                               Stretch="UniformToFill"/>
-                                                    </Border>
-                                                    <TextBlock Text="{Binding Hero}" FontSize="13" VerticalAlignment="Center"/>
-                                                </StackPanel>
-                                                <Border Grid.Column="5" 
-                                                        Background="{Binding ResultBrush}" 
-                                                        CornerRadius="4" 
-                                                        Padding="6,2" 
-                                                        HorizontalAlignment="Right" 
-                                                        VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Result}" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                                    <DataTemplate x:DataType="vm:HeroStatViewModel">
+                                        <Border Classes="Card" Margin="0,0,0,10" Padding="15">
+                                            <Grid ColumnDefinitions="50, *, 100, 100, 100">
+                                                <Border Grid.Column="0" CornerRadius="4" ClipToBounds="True" Width="40" Height="22">
+                                                    <Image asyncImageLoader:ImageLoader.Source="{Binding IconUrl}" Stretch="UniformToFill"/>
                                                 </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="15,0">
+                                                    <TextBlock Text="{Binding HeroName}" FontSize="16" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding TotalGames, StringFormat='\{0\} Matches'}" FontSize="12" Foreground="#666"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                    <TextBlock Text="Winrate" FontSize="10" Foreground="#555" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding WinRateDisplay}" FontSize="16" FontWeight="Bold"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                                                    <TextBlock Text="Wins / Losses" FontSize="10" Foreground="#555" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding Wins}" FontSize="16" FontWeight="Bold"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                                    <TextBlock Text="Net MMR" FontSize="10" Foreground="#555" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                                    <TextBlock Text="{Binding MmrChangeDisplay}" Foreground="{Binding MmrBrush}" FontSize="18" FontWeight="Black" HorizontalAlignment="Right"/>
+                                                </StackPanel>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </StackPanel>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
+                    </ScrollViewer>
+                </Carousel>
+            </Grid>
         </Grid>
-        
-        <!-- Loading Overlay -->
-        <Border IsVisible="{Binding IsBusy}" 
-                Background="#66000000" 
-                ZIndex="50">
+
+        <Border IsVisible="{Binding NeedsLogin}" Background="#EE000000" ZIndex="100">
+            <Border Classes="Card" Width="400" Margin="40" VerticalAlignment="Center">
+                <StackPanel Spacing="20">
+                    <TextBlock Text="Steam Login" FontSize="24" FontWeight="Black" HorizontalAlignment="Center"/>
+                    <TextBox Text="{Binding Username}" Watermark="Username" Height="45"/>
+                    <TextBox Text="{Binding Password}" Watermark="Password" PasswordChar="●" Height="45"/>
+                    <Button Command="{Binding LoginAndFetchCommand}" Content="Login" HorizontalAlignment="Stretch" Height="45" Classes="accent"/>
+                    <TextBlock Text="{Binding StatusText}" Foreground="#F44336" FontSize="12" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <Border IsVisible="{Binding IsBusy}" Background="#AA000000" ZIndex="50">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
-                <ProgressBar IsIndeterminate="True" Width="200" Height="4"/>
-                <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+                <ProgressBar IsIndeterminate="True" Width="200" Foreground="DodgerBlue"/>
+                <TextBlock Text="{Binding StatusText}" FontWeight="Bold"/>
             </StackPanel>
         </Border>
-    </Grid>
+    </Panel>
 </Window>
