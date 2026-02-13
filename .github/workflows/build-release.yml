@@ -46,11 +46,21 @@ jobs:
         run: |
           Move-Item "./publish/${{ matrix.project }}.exe" "./publish/track-mmr${{ matrix.suffix }}" -Force
 
+      - name: Build Installer (Desktop only)
+        if: matrix.project == 'TrackMmr.Desktop'
+        shell: pwsh
+        run: |
+          # Use iscc (Inno Setup Compiler) to build the installer
+          $version = if ($env:GITHUB_REF -like "refs/tags/v*") { $env:GITHUB_REF.Substring(11) } else { "1.0.0" }
+          iscc /DAppVersion=$version TrackMmr.Desktop/installer.iss
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: track-mmr-win-x64-${{ matrix.project }}
-          path: ./publish/track-mmr${{ matrix.suffix }}
+          path: |
+            ./publish/track-mmr${{ matrix.suffix }}
+            ./installer_output/*.exe
 
   release:
     name: Create GitHub Release
