@@ -2,13 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="TrackMmr.Desktop.App"
              xmlns:local="using:TrackMmr.Desktop"
-             xmlns:conv="using:TrackMmr.Desktop.Converters"
              x:DataType="local:App"
              RequestedThemeVariant="Default">
-
-    <Application.Resources>
-        <conv:IntToBoolConverter x:Key="IntToBoolConverter"/>
-    </Application.Resources>
 
     <Application.DataTemplates>
         <local:ViewLocator/>
