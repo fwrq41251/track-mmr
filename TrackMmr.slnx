@@ -2,4 +2,5 @@
   <Project Path="TrackMmr.Cli/TrackMmr.Cli.csproj" />
   <Project Path="TrackMmr.Core/TrackMmr.Core.csproj" />
   <Project Path="TrackMmr.Desktop/TrackMmr.Desktop.csproj" />
+  <Project Path="TrackMmr.Tests/TrackMmr.Tests.csproj" />
 </Solution>
