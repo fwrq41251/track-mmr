@@ -35,10 +35,10 @@ jobs:
           dotnet publish ${{ matrix.project }}/${{ matrix.project }}.csproj `
             -c Release `
             -r win-x64 `
-            --self-contained true `
+            --self-contained false `
             -p:PublishSingleFile=true `
             -p:PublishReadyToRun=true `
-            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true `
             -o ./publish
 
       - name: Rename executable

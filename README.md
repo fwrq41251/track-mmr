@@ -18,6 +18,8 @@ Dota 2 MMR 历史记录追踪工具，基于 [SteamKit2](https://github.com/Stea
 
 ## 使用说明
 
+**注意**：由于程序采用了瘦身后的分发模式，运行前请确保您的电脑已安装 **[.NET 10.0 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)**。
+
 ### 命令行版本 (CLI)
 
 ```bash
