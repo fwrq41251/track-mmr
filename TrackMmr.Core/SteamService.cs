@@ -14,6 +14,7 @@ public class SteamService : IDisposable
     private readonly SteamGameCoordinator _gameCoordinator;
 
     private readonly AppConfig _config;
+    private readonly IAuthenticator? _authenticator;
     private readonly TaskCompletionSource<bool> _loggedOnTcs = new();
     private readonly TaskCompletionSource<bool> _gcReadyTcs = new();
     private readonly TaskCompletionSource<CMsgDOTAGetPlayerMatchHistoryResponse> _matchHistoryTcs = new();
@@ -21,9 +22,10 @@ public class SteamService : IDisposable
     private bool _isRunning;
     private bool _disposed;
 
-    public SteamService(AppConfig config)
+    public SteamService(AppConfig config, IAuthenticator? authenticator = null)
     {
         _config = config;
+        _authenticator = authenticator;
         _steamClient = new SteamClient();
         _manager = new CallbackManager(_steamClient);
         _steamUser = _steamClient.GetHandler<SteamUser>()!;
@@ -132,7 +134,7 @@ public class SteamService : IDisposable
             DeviceFriendlyName = "TrackMmr",
             PlatformType = EAuthTokenPlatformType.k_EAuthTokenPlatformType_SteamClient,
             ClientOSType = EOSType.MacOSUnknown,
-            Authenticator = new UserConsoleAuthenticator()
+            Authenticator = _authenticator ?? new UserConsoleAuthenticator()
         };
 
         var authSession = await _steamClient.Authentication.BeginAuthSessionViaCredentialsAsync(authDetails);

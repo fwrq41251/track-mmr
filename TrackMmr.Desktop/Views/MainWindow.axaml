@@ -1,0 +1,108 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TrackMmr.Desktop.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+        x:Class="TrackMmr.Desktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Dota 2 MMR Tracker"
+        Width="900" Height="700"
+        MinWidth="700" MinHeight="500">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Login Panel (overlay) -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                IsVisible="{Binding NeedsLogin}"
+                Background="#CC000000"
+                ZIndex="10">
+            <Border Background="{DynamicResource SystemAltHighColor}"
+                    CornerRadius="8"
+                    Padding="32"
+                    MaxWidth="400" MaxHeight="300"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #40000000">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Steam Login" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBox Watermark="Steam Username" Text="{Binding Username}"/>
+                    <TextBox Watermark="Steam Password" PasswordChar="●" Text="{Binding Password}"/>
+                    <Button Content="Login &amp; Fetch MMR"
+                            Command="{Binding LoginAndFetchCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Classes="accent"/>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Main Content -->
+        <DockPanel Grid.Row="0" Grid.RowSpan="2" Margin="16">
+            <!-- Top bar -->
+            <Border DockPanel.Dock="Top" Margin="0,0,0,12">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <TextBlock Text="Current MMR:" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentMmr}" FontSize="28" FontWeight="Bold"
+                                   Foreground="DodgerBlue" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding StatusText}" VerticalAlignment="Center"
+                               HorizontalAlignment="Center" Foreground="Gray" FontSize="13"/>
+                    <Button Grid.Column="2" Content="⟳ Fetch MMR"
+                            Command="{Binding FetchMmrCommand}"
+                            IsEnabled="{Binding !IsBusy}"
+                            VerticalAlignment="Center" Padding="16,8"/>
+                </Grid>
+            </Border>
+
+            <!-- Chart -->
+            <lvc:CartesianChart DockPanel.Dock="Top" Height="250"
+                                Series="{Binding MmrSeries}"
+                                XAxes="{Binding XAxes}"
+                                YAxes="{Binding YAxes}"
+                                ZoomMode="X"
+                                Margin="0,0,0,12"/>
+
+            <!-- Match History Table -->
+            <Border CornerRadius="4" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Match History" FontSize="15" FontWeight="SemiBold"
+                               Margin="12,8"/>
+
+                    <!-- Header -->
+                    <Grid DockPanel.Dock="Top" Margin="12,0,12,4"
+                          ColumnDefinitions="140,100,70,70,*,60">
+                        <TextBlock Grid.Column="0" Text="Date" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Text="Match ID" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
+                        <TextBlock Grid.Column="2" Text="MMR" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
+                        <TextBlock Grid.Column="3" Text="Change" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
+                        <TextBlock Grid.Column="4" Text="Hero" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
+                        <TextBlock Grid.Column="5" Text="Result" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
+                    </Grid>
+
+                    <ListBox ItemsSource="{Binding Matches}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:MatchRowViewModel">
+                                <Grid ColumnDefinitions="140,100,70,70,*,60" Margin="0,2">
+                                    <TextBlock Grid.Column="0" Text="{Binding Date}" FontSize="13"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding MatchId}" FontSize="13"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Mmr}" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding MmrChange}" FontSize="13"
+                                               Foreground="{Binding ResultBrush}"/>
+                                    <TextBlock Grid.Column="4" Text="{Binding Hero}" FontSize="13"/>
+                                    <TextBlock Grid.Column="5" Text="{Binding Result}" FontSize="13"
+                                               Foreground="{Binding ResultBrush}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+        </DockPanel>
+    </Grid>
+</Window>
