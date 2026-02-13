@@ -27,6 +27,21 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _currentMmr = "-";
 
     [ObservableProperty]
+    private string _mmrDelta = "";
+
+    [ObservableProperty]
+    private string _rankTitle = "UNKNOWN";
+
+    [ObservableProperty]
+    private int _sessionWins;
+
+    [ObservableProperty]
+    private int _sessionLosses;
+
+    [ObservableProperty]
+    private string _winRate = "0%";
+
+    [ObservableProperty]
     private ISeries[] _mmrSeries = [];
 
     [ObservableProperty]
@@ -170,10 +185,44 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (records.Count > 0)
         {
-            CurrentMmr = records[0].Mmr.ToString();
+            var latest = records[0];
+            CurrentMmr = latest.Mmr.ToString();
+            
+            // Calculate Delta from previous match
+            if (records.Count > 1)
+            {
+                var delta = latest.MmrChange;
+                MmrDelta = delta >= 0 ? $"+{delta} (prev)" : $"{delta} (prev)";
+            }
+            else
+            {
+                MmrDelta = "0 (prev)";
+            }
+
+            // Simple Rank calculation logic (placeholders for now)
+            RankTitle = GetRankTitle(latest.Mmr);
+
+            // Session Stats (last 20 matches as "session" for now)
+            var sessionRecords = records.Take(20).ToList();
+            SessionWins = sessionRecords.Count(r => r.Winner);
+            SessionLosses = sessionRecords.Count(r => !r.Winner);
+            var total = SessionWins + SessionLosses;
+            WinRate = total > 0 ? $"{(double)SessionWins / total:P0}" : "0%";
         }
 
         UpdateChart(records);
+    }
+
+    private string GetRankTitle(int mmr)
+    {
+        if (mmr < 770) return "HERALD";
+        if (mmr < 1540) return "GUARDIAN";
+        if (mmr < 2310) return "CRUSADER";
+        if (mmr < 3080) return "ARCHON";
+        if (mmr < 3850) return "LEGEND";
+        if (mmr < 4620) return "ANCIENT";
+        if (mmr < 5420) return "DIVINE";
+        return "IMMORTAL";
     }
 
     private void UpdateChart(System.Collections.Generic.List<MmrRecord> records)
@@ -184,23 +233,23 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var ordered = records.AsEnumerable().Reverse().ToList();
+        var ordered = records.AsEnumerable().Reverse().TakeLast(10).ToList();
 
         var values = ordered.Select(r => (double)r.Mmr).ToArray();
-        var labels = ordered.Select(r => r.Timestamp.ToString("MM/dd")).ToArray();
+        var labels = ordered.Select(r => r.Timestamp.ToString("MMM_dd").ToUpper()).ToArray();
 
         MmrSeries =
         [
             new LineSeries<double>
             {
                 Values = values,
-                Name = "MMR",
-                Fill = new SolidColorPaint(SKColors.DodgerBlue.WithAlpha(30)),
-                GeometrySize = 8,
-                Stroke = new SolidColorPaint(SKColors.DodgerBlue, 3),
-                GeometryStroke = new SolidColorPaint(SKColors.DodgerBlue, 3),
-                GeometryFill = new SolidColorPaint(SKColors.White),
-                LineSmoothness = 0.35,
+                Name = "MMR Delta",
+                Fill = null,
+                GeometrySize = 10,
+                Stroke = new SolidColorPaint(SKColor.Parse("#38BDF8"), 3),
+                GeometryStroke = new SolidColorPaint(SKColor.Parse("#38BDF8"), 3),
+                GeometryFill = new SolidColorPaint(SKColor.Parse("#38BDF8")),
+                LineSmoothness = 0,
             }
         ];
 
@@ -210,9 +259,9 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 Labels = labels,
                 LabelsRotation = 0,
-                TextSize = 11,
-                LabelsPaint = new SolidColorPaint(SKColors.Gray),
-                SeparatorsPaint = new SolidColorPaint(SKColors.DarkGray.WithAlpha(20)),
+                TextSize = 12,
+                LabelsPaint = new SolidColorPaint(SKColor.Parse("#94A3B8")),
+                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#1E293B")),
             }
         ];
 
@@ -220,9 +269,9 @@ public partial class MainWindowViewModel : ViewModelBase
         [
             new Axis
             {
-                TextSize = 11,
-                LabelsPaint = new SolidColorPaint(SKColors.Gray),
-                SeparatorsPaint = new SolidColorPaint(SKColors.DarkGray.WithAlpha(20)),
+                TextSize = 12,
+                LabelsPaint = new SolidColorPaint(SKColor.Parse("#94A3B8")),
+                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#1E293B")),
                 Labeler = value => value.ToString("N0")
             }
         ];

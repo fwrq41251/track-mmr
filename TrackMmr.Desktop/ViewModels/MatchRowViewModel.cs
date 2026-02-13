@@ -7,9 +7,11 @@ public class MatchRowViewModel
     public MatchRowViewModel(TrackMmr.MmrRecord record)
     {
         Date = record.Timestamp.ToString("yyyy-MM-dd HH:mm");
+        FormattedTimestamp = record.Timestamp.ToString("MM-dd HH:mm");
         MatchId = record.MatchId.ToString();
         Mmr = record.Mmr.ToString();
         MmrChange = record.GetMmrChangeDisplay();
+        MmrDisplayText = $"{Mmr} {MmrChange}";
         Hero = TrackMmr.HeroNames.Get(record.HeroId);
         HeroIconUrl = TrackMmr.HeroNames.GetIconUrl(record.HeroId);
         Result = record.GetOutcomeDisplay();
@@ -23,9 +25,11 @@ public class MatchRowViewModel
     }
 
     public string Date { get; }
+    public string FormattedTimestamp { get; }
     public string MatchId { get; }
     public string Mmr { get; }
     public string MmrChange { get; }
+    public string MmrDisplayText { get; }
     public string Hero { get; }
     public string HeroIconUrl { get; }
     public string Result { get; }
