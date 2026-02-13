@@ -17,6 +17,9 @@ public class DatabaseTests : IDisposable
 
     public void Dispose()
     {
+        // Force SQLite to release all file locks held by the connection pool
+        Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+        
         try
         {
             if (File.Exists(_testDbPath))
