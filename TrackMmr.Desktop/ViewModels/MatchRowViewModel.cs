@@ -16,6 +16,9 @@ public class MatchRowViewModel
         ResultBrush = IsWin
             ? new SolidColorBrush(Color.Parse("#4CAF50"))
             : new SolidColorBrush(Color.Parse("#F44336"));
+        RowBackground = IsWin
+            ? new SolidColorBrush(Color.Parse("#154CAF50"))
+            : new SolidColorBrush(Color.Parse("#15F44336"));
     }
 
     public string Date { get; }
@@ -26,4 +29,5 @@ public class MatchRowViewModel
     public string Result { get; }
     public bool IsWin { get; }
     public IBrush ResultBrush { get; }
+    public IBrush RowBackground { get; }
 }

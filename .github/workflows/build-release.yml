@@ -1,0 +1,94 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }} (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            project: TrackMmr.Desktop
+            suffix: .exe
+          - os: windows-latest
+            rid: win-x64
+            project: TrackMmr.Cli
+            suffix: -cli.exe
+          - os: macos-latest
+            rid: osx-x64
+            project: TrackMmr.Desktop
+            suffix: -osx-x64
+          - os: macos-latest
+            rid: osx-arm64
+            project: TrackMmr.Desktop
+            suffix: -osx-arm64
+          - os: ubuntu-latest
+            rid: linux-x64
+            project: TrackMmr.Desktop
+            suffix: -linux-x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish App
+        run: |
+          dotnet publish ${{ matrix.project }}/${{ matrix.project }}.csproj 
+            -c Release 
+            -r ${{ matrix.rid }} 
+            --self-contained true 
+            -p:PublishSingleFile=true 
+            -p:PublishReadyToRun=true 
+            -p:IncludeNativeLibrariesForSelfExtract=true 
+            -o ./publish
+
+      - name: Rename executable
+        shell: bash
+        run: |
+          # Find the executable (it might be the project name or slightly different)
+          # We move it to a specific name for the release
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            mv ./publish/${{ matrix.project }}.exe ./publish/track-mmr${{ matrix.suffix }}
+          else
+            mv ./publish/${{ matrix.project }} ./publish/track-mmr${{ matrix.suffix }}
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: track-mmr-${{ matrix.rid }}-${{ matrix.project }}
+          path: ./publish/track-mmr${{ matrix.suffix }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./artifacts/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false

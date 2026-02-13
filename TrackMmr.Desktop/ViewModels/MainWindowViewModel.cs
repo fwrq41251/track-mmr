@@ -195,11 +195,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 Values = values,
                 Name = "MMR",
-                Fill = null,
-                GeometrySize = 6,
-                Stroke = new SolidColorPaint(SKColors.DodgerBlue, 2),
-                GeometryStroke = new SolidColorPaint(SKColors.DodgerBlue, 2),
+                Fill = new SolidColorPaint(SKColors.DodgerBlue.WithAlpha(30)),
+                GeometrySize = 8,
+                Stroke = new SolidColorPaint(SKColors.DodgerBlue, 3),
+                GeometryStroke = new SolidColorPaint(SKColors.DodgerBlue, 3),
                 GeometryFill = new SolidColorPaint(SKColors.White),
+                LineSmoothness = 0.35,
             }
         ];
 
@@ -208,8 +209,10 @@ public partial class MainWindowViewModel : ViewModelBase
             new Axis
             {
                 Labels = labels,
-                LabelsRotation = 45,
+                LabelsRotation = 0,
                 TextSize = 11,
+                LabelsPaint = new SolidColorPaint(SKColors.Gray),
+                SeparatorsPaint = new SolidColorPaint(SKColors.DarkGray.WithAlpha(20)),
             }
         ];
 
@@ -217,9 +220,10 @@ public partial class MainWindowViewModel : ViewModelBase
         [
             new Axis
             {
-                Name = "MMR",
                 TextSize = 11,
-                NameTextSize = 13,
+                LabelsPaint = new SolidColorPaint(SKColors.Gray),
+                SeparatorsPaint = new SolidColorPaint(SKColors.DarkGray.WithAlpha(20)),
+                Labeler = value => value.ToString("N0")
             }
         ];
     }

@@ -4,105 +4,210 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
         x:Class="TrackMmr.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Dota 2 MMR Tracker"
-        Width="900" Height="700"
-        MinWidth="700" MinHeight="500">
+        Width="1000" Height="800"
+        Background="#121212"
+        Foreground="#E0E0E0"
+        MinWidth="800" MinHeight="600">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*">
-        <!-- Login Panel (overlay) -->
-        <Border Grid.Row="0" Grid.RowSpan="2"
-                IsVisible="{Binding NeedsLogin}"
-                Background="#CC000000"
-                ZIndex="10">
-            <Border Background="{DynamicResource SystemAltHighColor}"
-                    CornerRadius="8"
-                    Padding="32"
-                    MaxWidth="400" MaxHeight="300"
+    <Window.Styles>
+        <Style Selector="Border.Card">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BoxShadow" Value="0 4 12 0 #40000000"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+        <Style Selector="TextBlock.Header">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="Foreground" Value="#BBBBBB"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <!-- Login Panel Overlay -->
+        <Border IsVisible="{Binding NeedsLogin}"
+                Background="#EE000000"
+                ZIndex="100">
+            <Border Background="#252525"
+                    CornerRadius="16"
+                    Padding="40"
+                    MaxWidth="450"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                    BoxShadow="0 4 16 0 #40000000">
-                <StackPanel Spacing="16">
-                    <TextBlock Text="Steam Login" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBox Watermark="Steam Username" Text="{Binding Username}"/>
-                    <TextBox Watermark="Steam Password" PasswordChar="●" Text="{Binding Password}"/>
-                    <Button Content="Login &amp; Fetch MMR"
+                    BoxShadow="0 10 30 0 #A0000000">
+                <StackPanel Spacing="20">
+                    <Image Source="avares://TrackMmr.Desktop/Assets/avalonia-logo.ico" Height="64" Margin="0,0,0,10"/>
+                    <TextBlock Text="Steam Authentication" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Connect your account to track MMR history" Foreground="Gray" HorizontalAlignment="Center" Margin="0,-10,0,0"/>
+                    
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Username" FontSize="12" FontWeight="SemiBold" Foreground="#888"/>
+                        <TextBox Text="{Binding Username}" Watermark="Enter Steam Username" Height="40" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Password" FontSize="12" FontWeight="SemiBold" Foreground="#888"/>
+                        <TextBox Text="{Binding Password}" Watermark="Enter Steam Password" PasswordChar="●" Height="40" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <Button Content="Sign In"
                             Command="{Binding LoginAndFetchCommand}"
                             HorizontalAlignment="Stretch"
+                            Height="45"
+                            CornerRadius="8"
+                            FontWeight="Bold"
                             HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="#1A73E8"
+                            Foreground="White"
                             Classes="accent"/>
+                    
+                    <TextBlock Text="{Binding StatusText}" 
+                               FontSize="12" 
+                               Foreground="#FF5252" 
+                               TextWrapping="Wrap" 
+                               HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
         </Border>
 
-        <!-- Main Content -->
-        <DockPanel Grid.Row="0" Grid.RowSpan="2" Margin="16">
-            <!-- Top bar -->
-            <Border DockPanel.Dock="Top" Margin="0,0,0,12">
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                        <TextBlock Text="Current MMR:" FontSize="16" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding CurrentMmr}" FontSize="28" FontWeight="Bold"
-                                   Foreground="DodgerBlue" VerticalAlignment="Center"/>
+        <!-- Main Layout -->
+        <Grid ColumnDefinitions="280, *">
+            
+            <!-- Sidebar / Stats -->
+            <Border Grid.Column="0" Background="#181818" Padding="20">
+                <StackPanel Spacing="24">
+                    <TextBlock Text="TrackMMR" FontSize="22" FontWeight="Black" Foreground="DodgerBlue" Margin="0,10,0,20"/>
+                    
+                    <Border Classes="Card" Margin="0" Padding="20">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="CURRENT MMR" FontSize="12" FontWeight="Bold" Foreground="#888" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding CurrentMmr}" FontSize="48" FontWeight="Black" Foreground="White" HorizontalAlignment="Center"/>
+                            <Border Background="#2E7D32" CornerRadius="4" Padding="8,2" HorizontalAlignment="Center" Margin="0,8,0,0">
+                                <TextBlock Text="Ranked Active" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="QUICK STATS" FontSize="11" FontWeight="Bold" Foreground="#555" Margin="0,10,0,0"/>
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="0,5">
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Text="Total Matches" FontSize="11" Foreground="#888"/>
+                                <TextBlock Text="{Binding Matches.Count}" FontSize="18" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="1">
+                                <TextBlock Text="Auto-Refresh" FontSize="11" Foreground="#888"/>
+                                <TextBlock Text="5 min" FontSize="18" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
-                    <TextBlock Grid.Column="1" Text="{Binding StatusText}" VerticalAlignment="Center"
-                               HorizontalAlignment="Center" Foreground="Gray" FontSize="13"/>
-                    <Button Grid.Column="2" Content="⟳ Fetch MMR"
-                            Command="{Binding FetchMmrCommand}"
+
+                    <Separator Background="#333" Margin="0,10"/>
+                    
+                    <Button Command="{Binding FetchMmrCommand}" 
                             IsEnabled="{Binding !IsBusy}"
-                            VerticalAlignment="Center" Padding="16,8"/>
-                </Grid>
+                            Background="#333"
+                            HorizontalAlignment="Stretch"
+                            Height="40"
+                            CornerRadius="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                            <PathIcon Data="M12 2V5M12 19V22M4.22 4.22L6.34 6.34M17.66 17.66L19.78 19.78M2 12H5M19 12H22M4.22 19.78L6.34 17.66M17.66 6.34L19.78 4.22" Width="14"/>
+                            <TextBlock Text="Sync Now" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="#777" TextWrapping="Wrap" TextAlignment="Center"/>
+                </StackPanel>
             </Border>
 
-            <!-- Chart -->
-            <lvc:CartesianChart DockPanel.Dock="Top" Height="250"
-                                Series="{Binding MmrSeries}"
-                                XAxes="{Binding XAxes}"
-                                YAxes="{Binding YAxes}"
-                                ZoomMode="X"
-                                Margin="0,0,0,12"/>
+            <!-- Main Content Area -->
+            <ScrollViewer Grid.Column="1">
+                <StackPanel Margin="16">
+                    <!-- Chart Section -->
+                    <Border Classes="Card">
+                        <StackPanel>
+                            <TextBlock Text="MMR Trend" Classes="Header"/>
+                            <lvc:CartesianChart Height="300"
+                                                Series="{Binding MmrSeries}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                TooltipPosition="Top"
+                                                ZoomMode="X"/>
+                        </StackPanel>
+                    </Border>
 
-            <!-- Match History Table -->
-            <Border CornerRadius="4" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="1">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="Match History" FontSize="15" FontWeight="SemiBold"
-                               Margin="12,8"/>
-
-                    <!-- Header -->
-                    <Grid DockPanel.Dock="Top" Margin="12,0,12,4"
-                          ColumnDefinitions="140,100,70,70,*,60">
-                        <TextBlock Grid.Column="0" Text="Date" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
-                        <TextBlock Grid.Column="1" Text="Match ID" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
-                        <TextBlock Grid.Column="2" Text="MMR" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
-                        <TextBlock Grid.Column="3" Text="Change" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
-                        <TextBlock Grid.Column="4" Text="Hero" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
-                        <TextBlock Grid.Column="5" Text="Result" FontWeight="SemiBold" FontSize="12" Foreground="Gray"/>
-                    </Grid>
-
-                    <ListBox ItemsSource="{Binding Matches}"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate x:DataType="vm:MatchRowViewModel">
-                                <Grid ColumnDefinitions="140,100,70,70,*,60" Margin="0,2">
-                                    <TextBlock Grid.Column="0" Text="{Binding Date}" FontSize="13"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding MatchId}" FontSize="13"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Mmr}" FontSize="13" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="3" Text="{Binding MmrChange}" FontSize="13"
-                                               Foreground="{Binding ResultBrush}"/>
-                                    <TextBlock Grid.Column="4" Text="{Binding Hero}" FontSize="13"/>
-                                    <TextBlock Grid.Column="5" Text="{Binding Result}" FontSize="13"
-                                               Foreground="{Binding ResultBrush}"/>
+                    <!-- History Section -->
+                    <Border Classes="Card">
+                        <StackPanel>
+                            <TextBlock Text="Recent Match History" Classes="Header"/>
+                            
+                            <!-- Table Header -->
+                            <Border Background="#252525" CornerRadius="8,8,0,0" Padding="12,10">
+                                <Grid ColumnDefinitions="140, 110, 80, 80, *, 80">
+                                    <TextBlock Grid.Column="0" Text="Date &amp; Time" FontSize="12" FontWeight="Bold" Foreground="#777"/>
+                                    <TextBlock Grid.Column="1" Text="Match ID" FontSize="12" FontWeight="Bold" Foreground="#777"/>
+                                    <TextBlock Grid.Column="2" Text="MMR" FontSize="12" FontWeight="Bold" Foreground="#777"/>
+                                    <TextBlock Grid.Column="3" Text="Change" FontSize="12" FontWeight="Bold" Foreground="#777"/>
+                                    <TextBlock Grid.Column="4" Text="Hero Played" FontSize="12" FontWeight="Bold" Foreground="#777"/>
+                                    <TextBlock Grid.Column="5" Text="Result" FontSize="12" FontWeight="Bold" Foreground="#777" HorizontalAlignment="Right"/>
                                 </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
-            </Border>
-        </DockPanel>
+                            </Border>
+
+                            <!-- List -->
+                            <ItemsControl ItemsSource="{Binding Matches}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:MatchRowViewModel">
+                                        <Border Background="{Binding RowBackground}" 
+                                                BorderBrush="#252525" 
+                                                BorderThickness="0,0,0,1"
+                                                Padding="12,14">
+                                            <Grid ColumnDefinitions="140, 110, 80, 80, *, 80">
+                                                <TextBlock Grid.Column="0" Text="{Binding Date}" FontSize="13" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding MatchId}" FontSize="12" Foreground="#888" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding Mmr}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3" Text="{Binding MmrChange}" FontSize="14" FontWeight="SemiBold" Foreground="{Binding ResultBrush}" VerticalAlignment="Center"/>
+                                                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                    <!-- Placeholder for Hero Icon -->
+                                                    <Ellipse Width="24" Height="24" Fill="#333"/>
+                                                    <TextBlock Text="{Binding Hero}" FontSize="13" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <Border Grid.Column="5" 
+                                                        Background="{Binding ResultBrush}" 
+                                                        CornerRadius="4" 
+                                                        Padding="6,2" 
+                                                        HorizontalAlignment="Right" 
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Result}" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+        
+        <!-- Loading Overlay -->
+        <Border IsVisible="{Binding IsBusy}" 
+                Background="#66000000" 
+                ZIndex="50">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="4"/>
+                <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
