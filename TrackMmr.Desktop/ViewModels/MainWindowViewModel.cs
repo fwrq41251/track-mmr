@@ -236,20 +236,23 @@ public partial class MainWindowViewModel : ViewModelBase
         var ordered = records.AsEnumerable().Reverse().TakeLast(10).ToList();
 
         var values = ordered.Select(r => (double)r.Mmr).ToArray();
-        var labels = ordered.Select(r => r.Timestamp.ToString("MMM_dd").ToUpper()).ToArray();
+        var labels = ordered.Select(r => r.Timestamp.ToString("MM-dd")).ToArray();
 
         MmrSeries =
         [
             new LineSeries<double>
             {
                 Values = values,
-                Name = "MMR Delta",
-                Fill = null,
-                GeometrySize = 10,
+                Name = "MMR",
+                // 渐变填充
+                Fill = new LinearGradientPaint(
+                    new [] { SKColor.Parse("#2038BDF8"), SKColor.Parse("#0038BDF8") },
+                    new SKPoint(0.5f, 0), new SKPoint(0.5f, 1)),
                 Stroke = new SolidColorPaint(SKColor.Parse("#38BDF8"), 3),
-                GeometryStroke = new SolidColorPaint(SKColor.Parse("#38BDF8"), 3),
-                GeometryFill = new SolidColorPaint(SKColor.Parse("#38BDF8")),
-                LineSmoothness = 0,
+                GeometrySize = 8,
+                GeometryStroke = new SolidColorPaint(SKColor.Parse("#38BDF8"), 2),
+                GeometryFill = new SolidColorPaint(SKColors.White),
+                LineSmoothness = 0.5, // 平滑曲线
             }
         ];
 
@@ -258,10 +261,9 @@ public partial class MainWindowViewModel : ViewModelBase
             new Axis
             {
                 Labels = labels,
-                LabelsRotation = 0,
-                TextSize = 12,
-                LabelsPaint = new SolidColorPaint(SKColor.Parse("#94A3B8")),
-                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#1E293B")),
+                TextSize = 10,
+                LabelsPaint = new SolidColorPaint(SKColor.Parse("#6B7280")),
+                SeparatorsPaint = null, // 隐藏纵向网格线
             }
         ];
 
@@ -269,10 +271,13 @@ public partial class MainWindowViewModel : ViewModelBase
         [
             new Axis
             {
-                TextSize = 12,
-                LabelsPaint = new SolidColorPaint(SKColor.Parse("#94A3B8")),
-                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#1E293B")),
-                Labeler = value => value.ToString("N0")
+                TextSize = 10,
+                LabelsPaint = new SolidColorPaint(SKColor.Parse("#6B7280")),
+                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#1F2937"), 1), // 极其微弱的横向参考线
+                Labeler = value => value.ToString("N0"),
+                // 让 Y 轴不从 0 开始，而是根据数据自动调整
+                MinLimit = values.Min() - 50,
+                MaxLimit = values.Max() + 50
             }
         ];
     }
