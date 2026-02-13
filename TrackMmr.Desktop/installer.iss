@@ -58,6 +58,8 @@ begin
 end;
 
 function InitializeSetup(): Boolean;
+var
+  ErrorCode: Integer;
 begin
   Result := True;
   if not IsDotNet10Installed() then
@@ -65,7 +67,7 @@ begin
     if MsgBox('TrackMmr requires .NET 10 Desktop Runtime to run. ' + #13#10#13#10 +
               'Would you like to visit the download page now?', mbConfirmation, MB_YESNO) = idYes then
     begin
-      ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/10.0', '', '', SW_SHOWNORMAL, ewNoWait, v);
+      ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/10.0', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
     end;
     // 我们仍然允许用户继续安装，或者你可以设为 Result := False 强制中断
   end;
