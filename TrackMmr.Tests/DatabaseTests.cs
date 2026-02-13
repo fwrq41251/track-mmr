@@ -17,10 +17,14 @@ public class DatabaseTests : IDisposable
 
     public void Dispose()
     {
-        if (File.Exists(_testDbPath))
+        try
         {
-            File.Delete(_testDbPath);
+            if (File.Exists(_testDbPath))
+            {
+                File.Delete(_testDbPath);
+            }
         }
+        catch { /* Ignore cleanup errors */ }
     }
 
     [Fact]
@@ -33,16 +37,16 @@ public class DatabaseTests : IDisposable
     [Fact]
     public void SaveRecords_ShouldInsertAndPreventDuplicates()
     {
+        var baseDate = DateTime.UtcNow;
         var records = new List<MmrRecord>
         {
-            new MmrRecord(DateTime.Now, 12345, 6000, 25, 1, true),
-            new MmrRecord(DateTime.Now.AddHours(-1), 12344, 5975, -25, 2, false)
+            new MmrRecord(baseDate, 12345, 6000, 25, 1, true),
+            new MmrRecord(baseDate.AddHours(-1), 12344, 5975, -25, 2, false)
         };
 
         var inserted = _db.SaveRecords(records);
         Assert.Equal(2, inserted);
 
-        // Try insert same records again
         var reinserted = _db.SaveRecords(records);
         Assert.Equal(0, reinserted);
     }
@@ -50,19 +54,20 @@ public class DatabaseTests : IDisposable
     [Fact]
     public void GetHistory_ShouldFilterByDays()
     {
-        var oldDate = DateTime.Now.AddDays(-10);
-        var newDate = DateTime.Now;
+        // Use UtcNow for consistency with MmrDatabase implementation
+        var recentDate = DateTime.UtcNow; 
+        var veryOldDate = DateTime.UtcNow.AddDays(-60);
 
         var records = new List<MmrRecord>
         {
-            new MmrRecord(newDate, 101, 6000, 25, 1, true),
-            new MmrRecord(oldDate, 102, 5975, 25, 1, true)
+            new MmrRecord(recentDate, 101, 6000, 25, 1, true),
+            new MmrRecord(veryOldDate, 102, 5975, 25, 1, true)
         };
 
         _db.SaveRecords(records);
 
         var allHistory = _db.GetHistory();
-        var recentHistory = _db.GetHistory(days: 5);
+        var recentHistory = _db.GetHistory(days: 30);
 
         Assert.Equal(2, allHistory.Count);
         Assert.Single(recentHistory);

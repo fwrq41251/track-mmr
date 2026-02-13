@@ -44,7 +44,7 @@ public class MmrDatabase
                 INSERT OR IGNORE INTO mmr_history (timestamp, match_id, mmr, mmr_change, hero_id, winner)
                 VALUES (@timestamp, @match_id, @mmr, @mmr_change, @hero_id, @winner);
                 """;
-            command.Parameters.AddWithValue("@timestamp", record.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
+            command.Parameters.AddWithValue("@timestamp", record.Timestamp.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss"));
             command.Parameters.AddWithValue("@match_id", (long)record.MatchId);
             command.Parameters.AddWithValue("@mmr", (long)record.Mmr);
             command.Parameters.AddWithValue("@mmr_change", (long)record.MmrChange);
@@ -70,7 +70,7 @@ public class MmrDatabase
                 WHERE timestamp >= @cutoff
                 ORDER BY timestamp DESC;
                 """;
-            command.Parameters.AddWithValue("@cutoff", DateTime.Now.AddDays(-days.Value).ToString("yyyy-MM-dd HH:mm:ss"));
+            command.Parameters.AddWithValue("@cutoff", DateTime.UtcNow.AddDays(-days.Value).ToString("yyyy-MM-dd HH:mm:ss"));
         }
         else
         {
@@ -86,7 +86,7 @@ public class MmrDatabase
         while (reader.Read())
         {
             records.Add(new MmrRecord(
-                DateTime.Parse(reader.GetString(0)),
+                DateTime.Parse(reader.GetString(0)).ToLocalTime(),
                 (ulong)reader.GetInt64(1),
                 (int)reader.GetInt64(2),
                 (int)reader.GetInt64(3),
