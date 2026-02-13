@@ -11,6 +11,7 @@ public class MatchRowViewModel
         Mmr = record.Mmr.ToString();
         MmrChange = record.GetMmrChangeDisplay();
         Hero = TrackMmr.HeroNames.Get(record.HeroId);
+        HeroIconUrl = TrackMmr.HeroNames.GetIconUrl(record.HeroId);
         Result = record.GetOutcomeDisplay();
         IsWin = record.Winner;
         ResultBrush = IsWin
@@ -26,6 +27,7 @@ public class MatchRowViewModel
     public string Mmr { get; }
     public string MmrChange { get; }
     public string Hero { get; }
+    public string HeroIconUrl { get; }
     public string Result { get; }
     public bool IsWin { get; }
     public IBrush ResultBrush { get; }

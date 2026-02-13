@@ -5,6 +5,8 @@ namespace TrackMmr.Desktop.Views;
 
 public partial class MainWindow : Window
 {
+    public bool IsExiting { get; set; }
+
     public MainWindow()
     {
         InitializeComponent();
@@ -13,5 +15,15 @@ public partial class MainWindow : Window
             if (DataContext is MainWindowViewModel vm)
                 vm.SetOwner(this);
         };
+    }
+
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        if (!IsExiting)
+        {
+            e.Cancel = true;
+            Hide();
+        }
+        base.OnClosing(e);
     }
 }

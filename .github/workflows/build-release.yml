@@ -1,4 +1,4 @@
-name: Build and Release
+name: Build and Release (Windows Only)
 
 on:
   push:
@@ -8,31 +8,15 @@ on:
 
 jobs:
   build:
-    name: Build for ${{ matrix.os }} (${{ matrix.rid }})
-    runs-on: ${{ matrix.os }}
+    name: Build Windows ${{ matrix.project }}
+    runs-on: windows-latest
     strategy:
       matrix:
         include:
-          - os: windows-latest
-            rid: win-x64
-            project: TrackMmr.Desktop
+          - project: TrackMmr.Desktop
             suffix: .exe
-          - os: windows-latest
-            rid: win-x64
-            project: TrackMmr.Cli
+          - project: TrackMmr.Cli
             suffix: -cli.exe
-          - os: macos-latest
-            rid: osx-x64
-            project: TrackMmr.Desktop
-            suffix: -osx-x64
-          - os: macos-latest
-            rid: osx-arm64
-            project: TrackMmr.Desktop
-            suffix: -osx-arm64
-          - os: ubuntu-latest
-            rid: linux-x64
-            project: TrackMmr.Desktop
-            suffix: -linux-x64
 
     steps:
       - name: Checkout code
@@ -45,30 +29,24 @@ jobs:
 
       - name: Publish App
         run: |
-          dotnet publish ${{ matrix.project }}/${{ matrix.project }}.csproj 
-            -c Release 
-            -r ${{ matrix.rid }} 
-            --self-contained true 
-            -p:PublishSingleFile=true 
-            -p:PublishReadyToRun=true 
-            -p:IncludeNativeLibrariesForSelfExtract=true 
+          dotnet publish ${{ matrix.project }}/${{ matrix.project }}.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:PublishReadyToRun=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
             -o ./publish
 
       - name: Rename executable
-        shell: bash
+        shell: pwsh
         run: |
-          # Find the executable (it might be the project name or slightly different)
-          # We move it to a specific name for the release
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            mv ./publish/${{ matrix.project }}.exe ./publish/track-mmr${{ matrix.suffix }}
-          else
-            mv ./publish/${{ matrix.project }} ./publish/track-mmr${{ matrix.suffix }}
-          fi
+          Move-Item "./publish/${{ matrix.project }}.exe" "./publish/track-mmr${{ matrix.suffix }}" -Force
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: track-mmr-${{ matrix.rid }}-${{ matrix.project }}
+          name: track-mmr-win-x64-${{ matrix.project }}
           path: ./publish/track-mmr${{ matrix.suffix }}
 
   release:

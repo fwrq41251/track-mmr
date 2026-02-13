@@ -32,6 +32,34 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
+    public void ToggleWindow_Click(object? sender, System.EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+        {
+            if (desktop.MainWindow.IsVisible)
+            {
+                desktop.MainWindow.Hide();
+            }
+            else
+            {
+                desktop.MainWindow.Show();
+                desktop.MainWindow.Activate();
+            }
+        }
+    }
+
+    public void ExitApp_Click(object? sender, System.EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            if (desktop.MainWindow is MainWindow mainWin)
+            {
+                mainWin.IsExiting = true;
+            }
+            desktop.Shutdown();
+        }
+    }
+
     private void DisableAvaloniaDataAnnotationValidation()
     {
         // Get an array of plugins to remove
