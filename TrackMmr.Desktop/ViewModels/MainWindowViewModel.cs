@@ -118,6 +118,9 @@ public partial class MainWindowViewModel : ViewModelBase
             var records = await steam.FetchMmrAsync();
             var inserted = _db.SaveRecords(records);
 
+            StatusText = "Enriching match details from OpenDota...";
+            await EnrichMatchDetailsAsync(steam.AccountId);
+
             StatusText = $"Fetched {records.Count} matches, {inserted} new. Auto-refresh in 5 min.";
             LoadHistory();
         }
@@ -158,6 +161,7 @@ public partial class MainWindowViewModel : ViewModelBase
             using var steam = new SteamService(config, authenticator);
             var records = await steam.FetchMmrAsync();
             var inserted = _db.SaveRecords(records);
+            await EnrichMatchDetailsAsync(steam.AccountId);
             StatusText = $"Fetched {records.Count} matches, {inserted} new. Auto-refresh in 5 min.";
             Password = "";
             LoadHistory();
@@ -170,6 +174,27 @@ public partial class MainWindowViewModel : ViewModelBase
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task EnrichMatchDetailsAsync(uint accountId)
+    {
+        var missingIds = _db.GetMatchIdsWithoutDetails();
+        if (missingIds.Count == 0) return;
+
+        try
+        {
+            var openDota = new OpenDotaService();
+            var details = await openDota.FetchMatchDetailsAsync(accountId);
+            foreach (var id in missingIds)
+            {
+                if (details.TryGetValue(id, out var d))
+                    _db.UpdateMatchDetails(id, d.Kills, d.Deaths, d.Assists, d.Duration);
+            }
+        }
+        catch
+        {
+            // Non-critical: OpenDota enrichment failure shouldn't block the app
         }
     }
 

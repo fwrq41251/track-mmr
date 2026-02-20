@@ -37,6 +37,8 @@ public class SteamService : IDisposable
         _manager.Subscribe<SteamGameCoordinator.MessageCallback>(OnGCMessage);
     }
 
+    public uint AccountId { get; private set; }
+
     public async Task<List<MmrRecord>> FetchMmrAsync()
     {
         _isRunning = true;
@@ -56,8 +58,8 @@ public class SteamService : IDisposable
         await StartDota2();
         await _gcReadyTcs.Task;
 
-        var accountId = _steamClient.SteamID!.AccountID;
-        RequestMatchHistory(accountId);
+        AccountId = _steamClient.SteamID!.AccountID;
+        RequestMatchHistory(AccountId);
 
         var response = await _matchHistoryTcs.Task;
 

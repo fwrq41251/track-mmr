@@ -130,11 +130,13 @@
                         
                         <!-- Table Header -->
                         <Border BorderBrush="#1F2937" BorderThickness="0,1" Padding="20,10" Background="#1F2937">
-                            <Grid ColumnDefinitions="45, 1.5*, 1*, 1*">
+                            <Grid ColumnDefinitions="45, 1.2*, 0.8*, 0.8*, 0.8*, 0.8*">
                                 <TextBlock Text="HERO" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Left"/>
-                                <TextBlock Grid.Column="1" Text="TIME" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Left" Margin="5,0,0,0"/>
-                                <TextBlock Grid.Column="2" Text="MMR" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="3" Text="CHANGE" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Column="1" Text="TIME" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="KDA" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="LEN" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="MMR" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="5" Text="Δ" FontSize="11" Foreground="#6B7280" FontWeight="Bold" HorizontalAlignment="Center"/>
                             </Grid>
                         </Border>
 
@@ -142,20 +144,26 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:MatchRowViewModel">
                                     <Border BorderBrush="#1F2937" BorderThickness="0,0,0,1" Padding="20,10">
-                                        <Grid ColumnDefinitions="45, 1.5*, 1*, 1*">
+                                        <Grid ColumnDefinitions="45, 1.2*, 0.8*, 0.8*, 0.8*, 0.8*">
                                             <!-- Hero Icon -->
                                             <Border Width="32" Height="20" CornerRadius="2" ClipToBounds="True" VerticalAlignment="Center" HorizontalAlignment="Left">
                                                 <Image asyncImageLoader:ImageLoader.Source="{Binding HeroIconUrl}" Stretch="UniformToFill"/>
                                             </Border>
                                             
                                             <!-- Time -->
-                                            <TextBlock Grid.Column="1" Text="{Binding FormattedTimestamp}" VerticalAlignment="Center" FontSize="12" Foreground="#D1D5DB" Margin="5,0,0,0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding FormattedTimestamp}" VerticalAlignment="Center" FontSize="12" Foreground="#D1D5DB" HorizontalAlignment="Center"/>
+                                            
+                                            <!-- KDA -->
+                                            <TextBlock Grid.Column="2" Text="{Binding Kda}" VerticalAlignment="Center" FontSize="12" Foreground="#D1D5DB" HorizontalAlignment="Center"/>
+                                            
+                                            <!-- Duration -->
+                                            <TextBlock Grid.Column="3" Text="{Binding Duration}" VerticalAlignment="Center" FontSize="12" Foreground="#9CA3AF" HorizontalAlignment="Center"/>
                                             
                                             <!-- Current MMR Value -->
-                                            <TextBlock Grid.Column="2" Text="{Binding Mmr}" VerticalAlignment="Center" FontSize="12" Foreground="White" HorizontalAlignment="Center"/>
+                                            <TextBlock Grid.Column="4" Text="{Binding Mmr}" VerticalAlignment="Center" FontSize="12" Foreground="White" HorizontalAlignment="Center"/>
                                             
-                                            <!-- MMR Change (Replacing Win/Loss) -->
-                                            <TextBlock Grid.Column="3" Text="{Binding MmrChange}" VerticalAlignment="Center" FontWeight="Bold" Foreground="{Binding ResultBrush}" FontSize="12" HorizontalAlignment="Right"/>
+                                            <!-- MMR Change -->
+                                            <TextBlock Grid.Column="5" Text="{Binding MmrChange}" VerticalAlignment="Center" FontWeight="Bold" Foreground="{Binding ResultBrush}" FontSize="12" HorizontalAlignment="Center"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

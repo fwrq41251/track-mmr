@@ -14,6 +14,8 @@ public class MatchRowViewModel
         MmrDisplayText = $"{Mmr} {MmrChange}";
         Hero = TrackMmr.HeroNames.Get(record.HeroId);
         HeroIconUrl = TrackMmr.HeroNames.GetIconUrl(record.HeroId);
+        Kda = record.GetKdaDisplay();
+        Duration = record.GetDurationDisplay();
         Result = record.GetOutcomeDisplay();
         IsWin = record.Winner;
         ResultBrush = IsWin
@@ -32,6 +34,8 @@ public class MatchRowViewModel
     public string MmrDisplayText { get; }
     public string Hero { get; }
     public string HeroIconUrl { get; }
+    public string Kda { get; }
+    public string Duration { get; }
     public string Result { get; }
     public bool IsWin { get; }
     public IBrush ResultBrush { get; }
