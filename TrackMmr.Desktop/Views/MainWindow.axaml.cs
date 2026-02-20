@@ -10,10 +10,14 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Loaded += (_, _) =>
+        Loaded += async (_, _) =>
         {
             if (DataContext is MainWindowViewModel vm)
+            {
                 vm.SetOwner(this);
+                if (!vm.NeedsLogin)
+                    await vm.FetchMmrCommand.ExecuteAsync(null);
+            }
         };
     }
 
